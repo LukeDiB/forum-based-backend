@@ -1,4 +1,4 @@
-const db = require("../connection");
+const db = require("../db/connection");
 
 function selectTopics() {
     let sqlString = `SELECT * FROM topics`
@@ -6,10 +6,6 @@ function selectTopics() {
 
 
   return db.query(sqlString).then(({ rows }) => {
-    //   console.log(rows);
-    // if(rows.length === 0){
-    //     return Promise.reject({ status: 404, message: 'path not found!' })
-    // }
     return rows
   });
 }
