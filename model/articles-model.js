@@ -1,10 +1,7 @@
 const db = require("../db/connection");
 
-function getArticleById(id) {
-  let sqlString = `SELECT * FROM articles`;
-  if (id) {
-    sqlString += ` WHERE article_id=$1;`;
-  }
+function selectArticleById(id) {
+  let sqlString = `SELECT * FROM articles WHERE article_id=$1;`;
   if (Number(id) === NaN) {
     return Promise.reject({ status: 400, message: "invalid id type!" });
   } else {
@@ -17,7 +14,7 @@ function getArticleById(id) {
   }
 }
 
-function getAllArticles(order = "desc", sort_by = "created_at") {
+function selectAllArticles(order = "desc", sort_by = "created_at") {
   const validColumns = [
     "title",
     "topic",
@@ -45,4 +42,4 @@ function getAllArticles(order = "desc", sort_by = "created_at") {
     return rows;
   });
 }
-module.exports = { getArticleById, getAllArticles };
+module.exports = { selectArticleById, selectAllArticles };

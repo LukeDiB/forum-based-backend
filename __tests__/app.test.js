@@ -27,8 +27,6 @@ describe("GET /api/topics", () => {
         });
       });
   });
-});
-describe("Err /api/topics", () => {
   test("404: responds with error message not found!", () => {
     return request(app)
       .get(`/api/topicss!?`)
@@ -69,9 +67,6 @@ describe("GET /api/articles/:article_id", () => {
         });
       });
   });
-});
-
-describe("Err /api/articles/article_id", () => {
   test("404: responds with error message not found!", () => {
     return request(app)
       .get(`/api/articles/15`)
@@ -98,6 +93,7 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
+         expect(body.length).toBe(13);
         body.forEach((column) => {
           expect(typeof column.author).toBe("string");
           expect(typeof column.title).toBe("string");
