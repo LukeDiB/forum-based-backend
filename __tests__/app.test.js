@@ -144,5 +144,58 @@ describe("GET /api/articles", () => {
         const { message } = body;
         expect(message).toBe("bad order!");
       });
-  })
+  });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200:responds with comments for specific article_id", () => {
+    return request(app)
+      .get(`/api/articles/1/comments`)
+      .expect(200)
+      .then(({ body }) => {
+        body.forEach((column) => {
+          expect(typeof column.comment_id).toBe("number");
+          expect(typeof column.votes).toBe("number");
+          expect(typeof column.created_at).toBe("string");
+          expect(typeof column.author).toBe("string");
+          expect(typeof column.body).toBe("string");
+          expect(typeof column.article_id).toBe("number");
+        });
+      });
+  });
+  test("200: sorts by data by default with newest comment first", () => {
+    return request(app)
+      .get(`/api/articles/1/comments?sort_by=created_at`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("404: invalid endpoint", () => {
+    return request(app)
+      .get(`/api/articles/1/commentsss`)
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("path not found!");
+      });
+  });
+  test("400: responds with error message when passed the incorrect type!", () => {
+    return request(app)
+      .get(`/api/articles/not-a-number/comments`)
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("invalid id type!");
+      });
+  });
+  test("404: responds with error message not found when article_id not found", () => {
+    return request(app)
+      .get(`/api/articles/4000/comments`)
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("id not found!");
+      });
+  });
 });
