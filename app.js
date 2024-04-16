@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const getTopics = require("./controller/topics-controller");
 const getArticles = require("./controller/articles-controller");
+const getCommentsByArticleId = require('./controller/comments-controller')
 const endpoints = require("./endpoints.json");
 
 app.use(express.json());
@@ -9,6 +10,7 @@ app.use(express.json());
 app.get("/api/topics", getTopics);
 app.get(`/api/articles`, getArticles)
 app.get(`/api/articles/:article_id`, getArticles);
+app.get(`/api/articles/:article_id/comments`, getCommentsByArticleId);
 app.get(`/api`, (req, res, next) => {
   res.status(200).send(endpoints);
 });
