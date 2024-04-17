@@ -43,5 +43,16 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "posts comment to article at article_id",
+    "queries": [],
+    "exampleResponse": {
+      "body": [
+        {
+          "body": "I find this existence challenging"
+        }
+      ]
+    }
   }
 }
