@@ -93,7 +93,7 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
-         expect(body.length).toBe(13);
+        expect(body.length).toBe(13);
         body.forEach((column) => {
           expect(typeof column.author).toBe("string");
           expect(typeof column.title).toBe("string");
@@ -194,4 +194,54 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(message).toBe("id not found!");
       });
   });
+});
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: responds with the posted comment", () => {
+    return request(app)
+      .post(`/api/articles/:article_id/comments`)
+      .send({
+        body: "swordfish",
+        votes: 0,
+        author: "butter_bridge",
+        article_id: 1,
+        created_at: "1995-12-17T03:24:00",
+      })
+      .expect(201)
+      .then((comment) => {
+        expect(comment.text).toBe("swordfish");
+      });
+  });
+  test("404: responds with username not found if author is not in the db", () => {
+    return request(app)
+      .post(`/api/articles/:article_id/comments`)
+      .send({
+        body: "swordfish",
+        votes: 0,
+        author: "not_butter_bridge",
+        article_id: 1,
+        created_at: "1995-12-17T03:24:00",
+      })
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("user not found!");
+      });
+  });
+  test('400: responds with -body must be filled!- when body is empty', () => {
+    return request(app)
+      .post(`/api/articles/:article_id/comments`)
+      .send({
+        body: "",
+        votes: 0,
+        author: "butter_bridge",
+        article_id: 1,
+        created_at: "1995-12-17T03:24:00",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("body must be filled!");
+      });
+  })
 });
