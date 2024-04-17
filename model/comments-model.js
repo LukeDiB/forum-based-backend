@@ -7,7 +7,7 @@ users.forEach((user) => {
 
 function fetchComments(article_id, order = "desc", sort_by = "created_at") {
   if (Number(article_id) === NaN) {
-    return Promise.reject({ status: 400, message: "invalid id type!" });
+    return Promise.reject({ status: 400, message: "invalid input!" });
   }
   let sqlString = `SELECT * FROM comments WHERE article_id=$1 ORDER BY ${sort_by} ${order};`;
   return db.query(sqlString, [article_id]).then(({ rows }) => {

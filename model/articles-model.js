@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const articles = require('../db/data/test-data/articles')
 
 function selectArticleById(id) {
   let sqlString = `SELECT * FROM articles WHERE article_id=$1;`;
@@ -9,7 +10,7 @@ function selectArticleById(id) {
       if (rows.length === 0) {
         return Promise.reject({ status: 404, message: "id not found!" });
       }
-      return rows;
+      return rows[0];
     });
   }
 }
@@ -42,4 +43,21 @@ function selectAllArticles(order = "desc", sort_by = "created_at") {
     return rows;
   });
 }
-module.exports = { selectArticleById, selectAllArticles };
+
+function updateArticleById(id, inc_votes) {
+  const newVote = inc_votes;
+  const sqlString = `UPDATE articles SET votes=votes+$1 WHERE article_id=$2;`;
+
+  if(id > articles.length){
+    return Promise.reject({ status: 404, message: "article not found!" });
+  }
+
+  if(Number(inc_votes) === NaN) {
+    return Promise.reject({ status: 400, message: "invalid input!" });
+  }
+
+  return db.query(sqlString, [newVote, id]).then((rows) => {
+    return rows;
+  });
+}
+module.exports = { selectArticleById, selectAllArticles, updateArticleById };

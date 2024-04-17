@@ -55,16 +55,14 @@ describe("GET /api/articles/:article_id", () => {
       .get(`/api/articles/1`)
       .expect(200)
       .then(({ body }) => {
-        body.forEach((column) => {
-          expect(typeof column.author).toBe("string");
-          expect(typeof column.title).toBe("string");
-          expect(typeof column.article_id).toBe("number");
-          expect(typeof column.body).toBe("string");
-          expect(typeof column.topic).toBe("string");
-          expect(typeof column.created_at).toBe("string");
-          expect(typeof column.votes).toBe("number");
-          expect(typeof column.article_img_url).toBe("string");
-        });
+          expect(typeof body.author).toBe("string");
+          expect(typeof body.title).toBe("string");
+          expect(typeof body.article_id).toBe("number");
+          expect(typeof body.body).toBe("string");
+          expect(typeof body.topic).toBe("string");
+          expect(typeof body.created_at).toBe("string");
+          expect(typeof body.votes).toBe("number");
+          expect(typeof body.article_img_url).toBe("string");
       });
   });
   test("404: responds with error message not found!", () => {
@@ -82,7 +80,7 @@ describe("GET /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body }) => {
         const { message } = body;
-        expect(message).toBe("invalid id type!");
+        expect(message).toBe("invalid input!");
       });
   });
 });
@@ -182,7 +180,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         const { message } = body;
-        expect(message).toBe("invalid id type!");
+        expect(message).toBe("invalid input!");
       });
   });
   test("404: responds with error message not found when article_id not found", () => {
@@ -199,7 +197,7 @@ describe("GET /api/articles/:article_id/comments", () => {
 describe("POST /api/articles/:article_id/comments", () => {
   test("201: responds with the posted comment", () => {
     return request(app)
-      .post(`/api/articles/:article_id/comments`)
+      .post(`/api/articles/1/comments`)
       .send({
         body: "swordfish",
         votes: 0,
@@ -214,7 +212,7 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
   test("404: responds with username not found if author is not in the db", () => {
     return request(app)
-      .post(`/api/articles/:article_id/comments`)
+      .post(`/api/articles/1/comments`)
       .send({
         body: "swordfish",
         votes: 0,
@@ -228,9 +226,9 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(message).toBe("user not found!");
       });
   });
-  test('400: responds with -body must be filled!- when body is empty', () => {
+  test("400: responds with -body must be filled!- when body is empty", () => {
     return request(app)
-      .post(`/api/articles/:article_id/comments`)
+      .post(`/api/articles/1/comments`)
       .send({
         body: "",
         votes: 0,
@@ -242,6 +240,51 @@ describe("POST /api/articles/:article_id/comments", () => {
       .then(({ body }) => {
         const { message } = body;
         expect(message).toBe("body must be filled!");
+      });
+  });
+});
+
+describe("PATCH: /api/articles/:article_id", () => {
+  test("200: responds with the updated article", () => {
+    const newVote = 100;
+    return request(app)
+      .patch(`/api/articles/1`)
+      .send({ inc_votes: newVote })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 200,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("400: sends error when inc_votes is not a number", () => {
+    const newVote = "not-a-number";
+    return request(app)
+      .patch(`/api/articles/1`)
+      .send({ inc_votes: newVote })
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("invalid input!");
+      });
+  });
+  test("404: responds with article not found! when input an incorrect article_id", () => {
+    const newVote = 100;
+    return request(app)
+      .patch(`/api/articles/1000`)
+      .send({ inc_votes: newVote })
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("article not found!");
       });
   })
 });

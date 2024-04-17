@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const getTopics = require("./controller/topics-controller");
-const getArticles = require("./controller/articles-controller");
+const { patchArticle, getArticles } = require("./controller/articles-controller");
 const { getCommentsByArticleId, postComment } = require('./controller/comments-controller')
 const endpoints = require("./endpoints.json");
 
@@ -15,6 +15,7 @@ app.get(`/api`, (req, res, next) => {
   res.status(200).send(endpoints);
 });
 app.post(`/api/articles/:article_id/comments`, postComment)
+app.patch(`/api/articles/:article_id`, patchArticle);
 
 app.all("*", (req, res, next) => {
   res.status(404).send({ message: "path not found!" });
@@ -30,7 +31,7 @@ app.use((err, req, res, next) => {
 
 app.use((err, req, res, next) => {
   if (err.code === `22P02`) {
-    res.status(400).send({ message: "invalid id type!" });
+    res.status(400).send({ message: "invalid input!" });
   }
   next(err);
 });
