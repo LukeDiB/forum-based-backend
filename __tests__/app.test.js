@@ -55,14 +55,14 @@ describe("GET /api/articles/:article_id", () => {
       .get(`/api/articles/1`)
       .expect(200)
       .then(({ body }) => {
-          expect(typeof body.author).toBe("string");
-          expect(typeof body.title).toBe("string");
-          expect(typeof body.article_id).toBe("number");
-          expect(typeof body.body).toBe("string");
-          expect(typeof body.topic).toBe("string");
-          expect(typeof body.created_at).toBe("string");
-          expect(typeof body.votes).toBe("number");
-          expect(typeof body.article_img_url).toBe("string");
+        expect(typeof body.author).toBe("string");
+        expect(typeof body.title).toBe("string");
+        expect(typeof body.article_id).toBe("number");
+        expect(typeof body.body).toBe("string");
+        expect(typeof body.topic).toBe("string");
+        expect(typeof body.created_at).toBe("string");
+        expect(typeof body.votes).toBe("number");
+        expect(typeof body.article_img_url).toBe("string");
       });
   });
   test("404: responds with error message not found!", () => {
@@ -286,5 +286,31 @@ describe("PATCH: /api/articles/:article_id", () => {
         const { message } = body;
         expect(message).toBe("article not found!");
       });
-  })
+  });
+});
+
+describe("DELETE: /api/comments/:comment_id", () => {
+  test("204: responds with no content", () => {
+    return request(app)
+      .delete(`/api/comments/1`)
+      .expect(204)
+      })
+  test("404: responds with error message not found!", () => {
+    return request(app)
+      .delete(`/api/comments/1500`)
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("id not found!");
+      });
+  });
+  test("400: responds with error message when passed the incorrect type!", () => {
+    return request(app)
+      .delete(`/api/comments/not-a-number`)
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("invalid input!");
+      });
+  });
 });

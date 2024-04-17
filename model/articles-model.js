@@ -60,4 +60,8 @@ function updateArticleById(id, inc_votes) {
     return rows;
   });
 }
-module.exports = { selectArticleById, selectAllArticles, updateArticleById };
+
+
+
+
+module.exports = { selectArticleById, selectAllArticles, updateArticleById};

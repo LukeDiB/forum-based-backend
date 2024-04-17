@@ -1,5 +1,6 @@
 const db = require("../db/connection");
 const users = require("../db/data/test-data/users");
+const commentsData = require('../db/data/test-data/comments')
 let authors = [];
 users.forEach((user) => {
   authors.push(user.username);
@@ -39,4 +40,22 @@ function insertComment(newComment) {
     });
 }
 
-module.exports = { fetchComments, insertComment };
+function removeCommentById(comment_id){
+
+  if (Number(comment_id) === NaN) {
+    return Promise.reject({ status: 400, message: "invalid input!" });
+  }
+
+  if (comment_id > commentsData.length) {
+    return Promise.reject({ status: 404, message: "id not found!" });
+  }
+
+
+
+
+  const sqlString = `DELETE FROM comments WHERE comment_id=$1`;
+  return db.query(sqlString, [comment_id])
+
+}
+
+module.exports = { fetchComments, insertComment, removeCommentById };

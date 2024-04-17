@@ -1,4 +1,8 @@
-const { fetchComments, insertComment } = require("../model/comments-model");
+const {
+  fetchComments,
+  insertComment,
+  removeCommentById,
+} = require("../model/comments-model");
 
 function getCommentsByArticleId(req, res, next) {
   const { article_id } = req.params;
@@ -11,14 +15,25 @@ function getCommentsByArticleId(req, res, next) {
     });
 }
 
-function postComment(req, res, next){
-  const newComment = req.body
-  insertComment(newComment).then((comment) => {
-    res.status(201).send(comment.body)
+function postComment(req, res, next) {
+  const newComment = req.body;
+  insertComment(newComment)
+    .then((comment) => {
+      res.status(201).send(comment.body);
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
+
+function deleteComment(req, res, next) {
+  const { comment_id } = req.params;
+  const message = "comment deleted!";
+  removeCommentById(comment_id).then(() => {
+    res.status(204).send();
   }).catch((err) => {
     next(err)
   })
-
 }
 
-module.exports = { getCommentsByArticleId, postComment }
+module.exports = { getCommentsByArticleId, postComment, deleteComment };

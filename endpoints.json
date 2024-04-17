@@ -72,5 +72,10 @@
         }
       ]
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes comment attached to respective comment_id",
+    "queries": ["comment_id"],
+    "exampleResponse": 204
   }
 }
