@@ -276,6 +276,17 @@ describe("PATCH: /api/articles/:article_id", () => {
         expect(message).toBe("invalid input!");
       });
   });
+  test("400: sends error when article_id is not a number", () => {
+    const newVote = 100;
+    return request(app)
+      .patch(`/api/articles/not-a-number`)
+      .send({ inc_votes: newVote })
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("invalid input!");
+      });
+  });
   test("404: responds with article not found! when input an incorrect article_id", () => {
     const newVote = 100;
     return request(app)
