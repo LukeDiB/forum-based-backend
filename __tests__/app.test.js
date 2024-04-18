@@ -390,15 +390,11 @@ describe("GET /api/articles?topics=", () => {
         expect(message).toBe("data not found!");
       });
   });
-  test('404: responds with no data found! when passed a valid topic that has no articles related to it', () => {
+  test("204: responds with no content when passed a valid topic that has no articles related to it", () => {
     return request(app)
-    .get(`/api/articles?topic=paper`)
-    .expect(404)
-    .then(({body}) => {
-      const {message} = body
-      expect(message).toBe('data not found!')
-    })
-  })
+      .get(`/api/articles?topic=paper`)
+      .expect(204)
+  });
 });
 
 describe("GET /api/articles/:article_id + comment_count", () => {
@@ -407,8 +403,8 @@ describe("GET /api/articles/:article_id + comment_count", () => {
       .get(`/api/articles/1`)
       .expect(200)
       .then(({ body }) => {
-        const { article } = body
-          expect(typeof article.comment_count).toBe("string");
-        });
+        const { article } = body;
+        expect(typeof article.comment_count).toBe("string");
       });
   });
+});
