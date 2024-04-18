@@ -3,9 +3,7 @@ const articles = require('../db/data/test-data/articles')
 
 function selectArticleById(id) {
   let sqlString = `SELECT * FROM articles WHERE article_id=$1;`;
-  if (Number(id) === NaN) {
-    return Promise.reject({ status: 400, message: "invalid id type!" });
-  } else {
+
     return db.query(sqlString, [id]).then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({ status: 404, message: "id not found!" });
@@ -13,7 +11,7 @@ function selectArticleById(id) {
       return rows[0];
     });
   }
-}
+
 
 function selectAllArticles(order = "desc", sort_by = "created_at", topic) {
   const validColumns = [
@@ -30,9 +28,6 @@ function selectAllArticles(order = "desc", sort_by = "created_at", topic) {
     return Promise.reject({ status: 400, message: "invalid query type!" });
   }
   
-  if (!order === "asc" || !order === "desc") {
-    return Promise.reject({ status: 400, message: "bad order!" });
-  }
 
   if (topic !== undefined) {
     let sqlString = `SELECT * FROM articles WHERE topic=$1;`;
@@ -60,10 +55,6 @@ function updateArticleById(id, inc_votes) {
 
   if(id > articles.length){
     return Promise.reject({ status: 404, message: "article not found!" });
-  }
-
-  if(Number(inc_votes) === NaN) {
-    return Promise.reject({ status: 400, message: "invalid input!" });
   }
 
   return db.query(sqlString, [newVote, id]).then((rows) => {
