@@ -6,9 +6,9 @@ const {
 
 function getArticles(req, res, next) {
   const { article_id } = req.params;
-  const { order, sort_by } = req.query;
+  const { order, sort_by, topic } = req.query;
   if (article_id === undefined) {
-    selectAllArticles(order, sort_by)
+    selectAllArticles(order, sort_by, topic)
       .then((articles) => {
         res.status(200).send(articles);
       })
@@ -29,15 +29,15 @@ function getArticles(req, res, next) {
 function patchArticle(req, res, next) {
   const { article_id } = req.params;
   const { inc_votes } = req.body;
-  updateArticleById(article_id, inc_votes).then(() => {
-    selectArticleById(article_id).then((article) => {
-      res.status(200).send(article);
+  updateArticleById(article_id, inc_votes)
+    .then(() => {
+      selectArticleById(article_id).then((article) => {
+        res.status(200).send(article);
+      });
     })
-  }).catch((err) => {
-    next(err)
-  })
+    .catch((err) => {
+      next(err);
+    });
 }
-
-
 
 module.exports = { patchArticle, getArticles };
