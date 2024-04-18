@@ -58,6 +58,7 @@ describe("GET /api/articles/:article_id", () => {
         expect(typeof body.author).toBe("string");
         expect(typeof body.title).toBe("string");
         expect(typeof body.article_id).toBe("number");
+        expect(typeof body.comment_count).toBe("string");
         expect(typeof body.body).toBe("string");
         expect(typeof body.topic).toBe("string");
         expect(typeof body.created_at).toBe("string");
@@ -258,6 +259,7 @@ describe("PATCH: /api/articles/:article_id", () => {
           topic: "mitch",
           author: "butter_bridge",
           body: "I find this existence challenging",
+          comment_count: "11",
           created_at: "2020-07-09T20:11:00.000Z",
           votes: 200,
           article_img_url:
@@ -327,26 +329,26 @@ describe("DELETE: /api/comments/:comment_id", () => {
 describe("GET /api/users", () => {
   test("200: responds with all users username, name, avatar_url", () => {
     return request(app)
-    .get(`/api/users`)
-    .expect(200)
-    .then(({ body }) => {
-      const { users } = body;
-      expect(users.length).toBe(4);
-      users.forEach((user) => {
-        expect(typeof user.username).toBe("string");
-        expect(typeof user.name).toBe("string");
-        expect(typeof user.avatar_url).toBe("string");
+      .get(`/api/users`)
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users.length).toBe(4);
+        users.forEach((user) => {
+          expect(typeof user.username).toBe("string");
+          expect(typeof user.name).toBe("string");
+          expect(typeof user.avatar_url).toBe("string");
+        });
       });
-    });
   });
   test("404: responds with error message not found!", () => {
     return request(app)
-    .get(`/api/usersss`)
-    .expect(404)
-    .then(({ body }) => {
-      const { message } = body;
-      expect(message).toBe("path not found!");
-    });
+      .get(`/api/usersss`)
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("path not found!");
+      });
   });
 });
 
@@ -358,31 +360,66 @@ describe("GET /api/articles?topics=", () => {
       .then(({ body }) => {
         expect(body.length).toBe(1);
         body.forEach((article) => {
-          expect(typeof article.title).toBe('string'),
-          expect(article.topic).toBe('cats'),
-          expect(typeof article.author).toBe('string'),
-          expect(typeof article.body).toBe('string'),
-          expect(typeof article.article_img_url).toBe('string')
-        }
-      );
+          expect(typeof article.title).toBe("string"),
+            expect(article.topic).toBe("cats"),
+            expect(typeof article.author).toBe("string"),
+            expect(typeof article.body).toBe("string"),
+            expect(typeof article.article_img_url).toBe("string");
+        });
+      });
   });
-})
-test("404: invalid endpoint", () => {
-  return request(app)
-    .get(`/api/articlesssss?topic=cats`)
-    .expect(404)
-    .then(({ body }) => {
-      const { message } = body;
-      expect(message).toBe("path not found!");
-    });
+  test("404: invalid endpoint", () => {
+    return request(app)
+      .get(`/api/articlesssss?topic=cats`)
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("path not found!");
+      });
+  });
+  test("404: responds with error message when passed a topic that doesn't have any articles related to it", () => {
+    return request(app)
+      .get(`/api/articles?topic=catssss`)
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("path not found!");
+      });
+  });
 });
-test("404: responds with error message when passed a topic that doesn't have any articles related to it", () => {
-  return request(app)
-    .get(`/api/articles?topic=catssss`)
-    .expect(404)
-    .then(({ body }) => {
-      const { message } = body;
-      expect(message).toBe("path not found!");
-    });
-});
-});
+
+describe("GET /api/articles/:article_id + comment_count", () => {
+  test("200: responds with an article with the related article_id and adds a comment count", () => {
+    return request(app)
+      .get(`/api/articles/1`)
+      .expect(200)
+      .then(({ body }) => {
+          expect(typeof body.author).toBe("string");
+          expect(typeof body.title).toBe("string");
+          expect(typeof body.article_id).toBe("number");
+          expect(typeof body.topic).toBe("string");
+          expect(typeof body.created_at).toBe("string");
+          expect(typeof body.votes).toBe("number");
+          expect(typeof body.article_img_url).toBe("string");
+          expect(typeof body.comment_count).toBe("string");
+        });
+      });
+      test("404: responds with error message when article_id is not found!", () => {
+        return request(app)
+          .get(`/api/articles/27`)
+          .expect(404)
+          .then(({ body }) => {
+            const { message } = body;
+            expect(message).toBe("id not found!");
+          });
+      });
+      test("400: responds with error message when article_id is NaN!", () => {
+        return request(app)
+          .get(`/api/articles/not-a-number`)
+          .expect(400)
+          .then(({ body }) => {
+            const { message } = body;
+            expect(message).toBe("invalid input!");
+          });
+      });
+  });
