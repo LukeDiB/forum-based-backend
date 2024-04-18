@@ -10,7 +10,7 @@ function getArticles(req, res, next) {
   if (article_id === undefined) {
     selectAllArticles(order, sort_by, topic)
       .then((articles) => {
-        res.status(200).send(articles);
+        res.status(200).send({ articles });
       })
       .catch((err) => {
         next(err);
@@ -18,7 +18,7 @@ function getArticles(req, res, next) {
   } else {
     selectArticleById(article_id)
       .then((article) => {
-        res.status(200).send(article);
+        res.status(200).send({ article });
       })
       .catch((err) => {
         next(err);
@@ -32,7 +32,7 @@ function patchArticle(req, res, next) {
   updateArticleById(article_id, inc_votes)
     .then(() => {
       selectArticleById(article_id).then((article) => {
-        res.status(200).send(article);
+        res.status(200).send({ article });
       });
     })
     .catch((err) => {

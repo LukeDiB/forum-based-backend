@@ -55,15 +55,15 @@ describe("GET /api/articles/:article_id", () => {
       .get(`/api/articles/1`)
       .expect(200)
       .then(({ body }) => {
-        expect(typeof body.author).toBe("string");
-        expect(typeof body.title).toBe("string");
-        expect(typeof body.article_id).toBe("number");
-        expect(typeof body.comment_count).toBe("string");
-        expect(typeof body.body).toBe("string");
-        expect(typeof body.topic).toBe("string");
-        expect(typeof body.created_at).toBe("string");
-        expect(typeof body.votes).toBe("number");
-        expect(typeof body.article_img_url).toBe("string");
+        const { article } = body;
+        expect(typeof article.author).toBe("string");
+        expect(typeof article.title).toBe("string");
+        expect(typeof article.article_id).toBe("number");
+        expect(typeof article.body).toBe("string");
+        expect(typeof article.topic).toBe("string");
+        expect(typeof article.created_at).toBe("string");
+        expect(typeof article.votes).toBe("number");
+        expect(typeof article.article_img_url).toBe("string");
       });
   });
   test("404: responds with error message not found!", () => {
@@ -92,8 +92,9 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
-        expect(body.length).toBe(13);
-        body.forEach((column) => {
+        const { articles } = body;
+        expect(articles.length).toBe(13);
+        articles.forEach((column) => {
           expect(typeof column.author).toBe("string");
           expect(typeof column.title).toBe("string");
           expect(typeof column.article_id).toBe("number");
@@ -110,7 +111,8 @@ describe("GET /api/articles", () => {
       .get(`/api/articles?sort_by=created_at`)
       .expect(200)
       .then(({ body }) => {
-        expect(body).toBeSortedBy("created_at", { descending: true });
+        const { articles } = body;
+        expect(articles).toBeSortedBy("created_at", { descending: true });
       });
   });
   test("404: invalid endpoint", () => {
@@ -253,7 +255,8 @@ describe("PATCH: /api/articles/:article_id", () => {
       .send({ inc_votes: newVote })
       .expect(200)
       .then(({ body }) => {
-        expect(body).toEqual({
+        const { article } = body;
+        expect(article).toEqual({
           article_id: 1,
           title: "Living in the shadow of a great man",
           topic: "mitch",
@@ -358,8 +361,9 @@ describe("GET /api/articles?topics=", () => {
       .get(`/api/articles?topic=cats`)
       .expect(200)
       .then(({ body }) => {
-        expect(body.length).toBe(1);
-        body.forEach((article) => {
+        const { articles } = body;
+        expect(articles.length).toBe(1);
+        articles.forEach((article) => {
           expect(typeof article.title).toBe("string"),
             expect(article.topic).toBe("cats"),
             expect(typeof article.author).toBe("string"),
@@ -383,9 +387,18 @@ describe("GET /api/articles?topics=", () => {
       .expect(404)
       .then(({ body }) => {
         const { message } = body;
-        expect(message).toBe("path not found!");
+        expect(message).toBe("data not found!");
       });
   });
+  test('404: responds with no data found! when passed a valid topic that has no articles related to it', () => {
+    return request(app)
+    .get(`/api/articles?topic=paper`)
+    .expect(404)
+    .then(({body}) => {
+      const {message} = body
+      expect(message).toBe('data not found!')
+    })
+  })
 });
 
 describe("GET /api/articles/:article_id + comment_count", () => {
@@ -394,32 +407,8 @@ describe("GET /api/articles/:article_id + comment_count", () => {
       .get(`/api/articles/1`)
       .expect(200)
       .then(({ body }) => {
-          expect(typeof body.author).toBe("string");
-          expect(typeof body.title).toBe("string");
-          expect(typeof body.article_id).toBe("number");
-          expect(typeof body.topic).toBe("string");
-          expect(typeof body.created_at).toBe("string");
-          expect(typeof body.votes).toBe("number");
-          expect(typeof body.article_img_url).toBe("string");
-          expect(typeof body.comment_count).toBe("string");
+        const { article } = body
+          expect(typeof article.comment_count).toBe("string");
         });
-      });
-      test("404: responds with error message when article_id is not found!", () => {
-        return request(app)
-          .get(`/api/articles/27`)
-          .expect(404)
-          .then(({ body }) => {
-            const { message } = body;
-            expect(message).toBe("id not found!");
-          });
-      });
-      test("400: responds with error message when article_id is NaN!", () => {
-        return request(app)
-          .get(`/api/articles/not-a-number`)
-          .expect(400)
-          .then(({ body }) => {
-            const { message } = body;
-            expect(message).toBe("invalid input!");
-          });
       });
   });
