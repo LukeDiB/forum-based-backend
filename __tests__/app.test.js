@@ -291,10 +291,8 @@ describe("PATCH: /api/articles/:article_id", () => {
 
 describe("DELETE: /api/comments/:comment_id", () => {
   test("204: responds with no content", () => {
-    return request(app)
-      .delete(`/api/comments/1`)
-      .expect(204)
-      })
+    return request(app).delete(`/api/comments/1`).expect(204);
+  });
   test("404: responds with error message not found!", () => {
     return request(app)
       .delete(`/api/comments/1500`)
@@ -311,6 +309,32 @@ describe("DELETE: /api/comments/:comment_id", () => {
       .then(({ body }) => {
         const { message } = body;
         expect(message).toBe("invalid input!");
+      });
+  });
+});
+
+describe("GET /api/users", () => {
+  test("200: responds with all users username, name, avatar_url", () => {
+    return request(app)
+      .get(`/api/users`)
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users.length).toBe(4);
+        users.forEach((user) => {
+          expect(typeof user.username).toBe("string");
+          expect(typeof user.name).toBe("string");
+          expect(typeof user.avatar_url).toBe("string");
+        });
+      });
+  });
+  test("404: responds with error message not found!", () => {
+    return request(app)
+      .get(`/api/usersss`)
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("path not found!");
       });
   });
 });
