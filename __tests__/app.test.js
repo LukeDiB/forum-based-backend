@@ -316,25 +316,62 @@ describe("DELETE: /api/comments/:comment_id", () => {
 describe("GET /api/users", () => {
   test("200: responds with all users username, name, avatar_url", () => {
     return request(app)
-      .get(`/api/users`)
-      .expect(200)
-      .then(({ body }) => {
-        const { users } = body;
-        expect(users.length).toBe(4);
-        users.forEach((user) => {
-          expect(typeof user.username).toBe("string");
-          expect(typeof user.name).toBe("string");
-          expect(typeof user.avatar_url).toBe("string");
-        });
+    .get(`/api/users`)
+    .expect(200)
+    .then(({ body }) => {
+      const { users } = body;
+      expect(users.length).toBe(4);
+      users.forEach((user) => {
+        expect(typeof user.username).toBe("string");
+        expect(typeof user.name).toBe("string");
+        expect(typeof user.avatar_url).toBe("string");
       });
+    });
   });
   test("404: responds with error message not found!", () => {
     return request(app)
-      .get(`/api/usersss`)
-      .expect(404)
-      .then(({ body }) => {
-        const { message } = body;
-        expect(message).toBe("path not found!");
-      });
+    .get(`/api/usersss`)
+    .expect(404)
+    .then(({ body }) => {
+      const { message } = body;
+      expect(message).toBe("path not found!");
+    });
   });
+});
+
+describe("GET /api/articles?topics=", () => {
+  test("200: serves articles with queried topic", () => {
+    return request(app)
+      .get(`/api/articles?topic=cats`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.length).toBe(1);
+        body.forEach((article) => {
+          expect(typeof article.title).toBe('string'),
+          expect(article.topic).toBe('cats'),
+          expect(typeof article.author).toBe('string'),
+          expect(typeof article.body).toBe('string'),
+          expect(typeof article.article_img_url).toBe('string')
+        }
+      );
+  });
+})
+test("404: invalid endpoint", () => {
+  return request(app)
+    .get(`/api/articlesssss?topic=cats`)
+    .expect(404)
+    .then(({ body }) => {
+      const { message } = body;
+      expect(message).toBe("path not found!");
+    });
+});
+test("404: responds with error message when passed a topic that doesn't have any articles related to it", () => {
+  return request(app)
+    .get(`/api/articles?topic=catssss`)
+    .expect(404)
+    .then(({ body }) => {
+      const { message } = body;
+      expect(message).toBe("path not found!");
+    });
+});
 });
