@@ -2,6 +2,8 @@ const {
   fetchComments,
   insertComment,
   removeCommentById,
+  patchCommentById,
+  selectCommentById,
 } = require("../model/comments-model");
 
 function getCommentsByArticleId(req, res, next) {
@@ -13,6 +15,11 @@ function getCommentsByArticleId(req, res, next) {
     .catch((err) => {
       next(err);
     });
+}
+
+function getCommentById(req, res, next) {
+  const { comment_id } = req.params;
+  selectCommentById(comment_id);
 }
 
 function postComment(req, res, next) {
@@ -29,11 +36,31 @@ function postComment(req, res, next) {
 function deleteComment(req, res, next) {
   const { comment_id } = req.params;
   const message = "comment deleted!";
-  removeCommentById(comment_id).then(() => {
-    res.status(204).send();
+  removeCommentById(comment_id)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
+
+function patchComment(req, res, next) {
+  const { comment_id } = req.params;
+  const { inc_votes } = req.body;
+  patchCommentById(comment_id, inc_votes).then(() => {
+    selectCommentById(comment_id).then((comment) => {
+      res.status(200).send({ comment });
+    })
   }).catch((err) => {
     next(err)
   })
 }
 
-module.exports = { getCommentsByArticleId, postComment, deleteComment };
+module.exports = {
+  getCommentsByArticleId,
+  postComment,
+  deleteComment,
+  patchComment,
+  getCommentById,
+};

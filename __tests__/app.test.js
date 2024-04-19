@@ -429,3 +429,57 @@ describe("GET /api/users/:username", () => {
       });
   });
 });
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("200: updates the votes", () => {
+    const newVote = 100;
+    return request(app)
+      .patch(`/api/comments/1`)
+      .send({ inc_votes: newVote })
+      .expect(200)
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toEqual({
+        comment_id: 1,
+        body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        article_id: 9,
+        author: 'butter_bridge',
+        votes: 116,
+        created_at: '2020-04-06T12:17:00.000Z'
+        });
+      });
+  });
+  test("400: sends error when inc_votes is not a number", () => {
+    const newVote = "not-a-number";
+    return request(app)
+      .patch(`/api/comments/1`)
+      .send({ inc_votes: newVote })
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("invalid input!");
+      });
+  });
+  test("400: sends error when comment_id is not a number", () => {
+    const newVote = 100;
+    return request(app)
+      .patch(`/api/comments/not-a-number`)
+      .send({ inc_votes: newVote })
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("invalid input!");
+      });
+  });
+  test("404: responds with comment not found! when input an incorrect comment_id", () => {
+    const newVote = 100;
+    return request(app)
+      .patch(`/api/comments/1000`)
+      .send({ inc_votes: newVote })
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("comment not found!");
+      });
+  });
+});
