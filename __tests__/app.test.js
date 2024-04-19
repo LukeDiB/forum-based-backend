@@ -391,9 +391,7 @@ describe("GET /api/articles?topics=", () => {
       });
   });
   test("204: responds with no content when passed a valid topic that has no articles related to it", () => {
-    return request(app)
-      .get(`/api/articles?topic=paper`)
-      .expect(204)
+    return request(app).get(`/api/articles?topic=paper`).expect(204);
   });
 });
 
@@ -405,6 +403,29 @@ describe("GET /api/articles/:article_id + comment_count", () => {
       .then(({ body }) => {
         const { article } = body;
         expect(typeof article.comment_count).toBe("string");
+      });
+  });
+});
+
+describe("GET /api/users/:username", () => {
+  test("200: responds with user with related username", () => {
+    return request(app)
+      .get(`/api/users/butter_bridge`)
+      .expect(200)
+      .then(({ body }) => {
+        const { user } = body;
+        expect(typeof user.username).toBe("string");
+        expect(typeof user.avatar_url).toBe("string");
+        expect(typeof user.name).toBe("string");
+      });
+  });
+  test("404: responds with an error message user not found!", () => {
+    return request(app)
+      .delete(`/api/users/not-a-real-user`)
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("path not found!");
       });
   });
 });

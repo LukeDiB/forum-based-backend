@@ -7,4 +7,11 @@ function selectAllUsers() {
   });
 }
 
-module.exports = selectAllUsers;
+function selectByUsername(username) {
+  const sqlString = `SELECT * FROM users WHERE username=$1`;
+  return db.query(sqlString, [username]).then(({rows}) => {
+    return rows[0]
+  })
+}
+
+module.exports = { selectAllUsers, selectByUsername };

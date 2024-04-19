@@ -1,13 +1,23 @@
-const selectAllUsers = require("../model/users-model");
+const { selectAllUsers, selectByUsername } = require("../model/users-model");
 
 function getUsers(req, res, next) {
-  selectAllUsers()
-    .then((users) => {
-      res.status(200).send({ users });
+  const { username } = req.params;
+
+  if (username === undefined) {
+    selectAllUsers()
+      .then((users) => {
+        res.status(200).send({ users });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  } else {
+    selectByUsername(username).then((user) => {
+      res.status(200).send({ user });
+    }).catch((err) => {
+      next(err)
     })
-    .catch((err) => {
-      next(err);
-    });
+  }
 }
 
 module.exports = getUsers;
