@@ -1,6 +1,6 @@
 const db = require("../db/connection");
 const users = require("../db/data/test-data/users");
-const commentsData = require('../db/data/test-data/comments')
+const commentsData = require("../db/data/test-data/comments");
 let authors = [];
 users.forEach((user) => {
   authors.push(user.username);
@@ -20,8 +20,8 @@ function insertComment(newComment) {
   if (!authors.includes(newComment.author)) {
     return Promise.reject({ status: 404, message: "user not found!" });
   }
-  if(newComment.body === ''){
-    return Promise.reject({status: 400, message: 'body must be filled!'})
+  if (newComment.body === "") {
+    return Promise.reject({ status: 400, message: "body must be filled!" });
   }
   const sqlString = `INSERT INTO comments (body, votes, author, article_id, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING *`;
   return db
@@ -37,15 +37,38 @@ function insertComment(newComment) {
     });
 }
 
-function removeCommentById(comment_id){
+function selectCommentById(comment_id) {
+  const sqlString = `SELECT * FROM comments WHERE comment_id=$1`;
+  return db.query(sqlString, [comment_id]).then(({ rows }) => {
+    return rows[0];
+  });
+}
 
+function removeCommentById(comment_id) {
   if (comment_id > commentsData.length) {
     return Promise.reject({ status: 404, message: "id not found!" });
   }
-  
-  const sqlString = `DELETE FROM comments WHERE comment_id=$1`;
-  return db.query(sqlString, [comment_id])
 
+  const sqlString = `DELETE FROM comments WHERE comment_id=$1`;
+  return db.query(sqlString, [comment_id]);
 }
 
-module.exports = { fetchComments, insertComment, removeCommentById };
+function patchCommentById(comment_id, inc_votes) {
+  const sqlString = `UPDATE comments SET votes=votes+$1 WHERE comment_id=$2;`;
+
+  if (comment_id > commentsData.length) {
+    return Promise.reject({ status: 404, message: "comment not found!" });
+  }
+
+  return db.query(sqlString, [inc_votes, comment_id]).then((rows) => {
+    return rows;
+  });
+}
+
+module.exports = {
+  fetchComments,
+  insertComment,
+  removeCommentById,
+  patchCommentById,
+  selectCommentById,
+};
