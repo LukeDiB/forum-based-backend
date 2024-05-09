@@ -26,6 +26,7 @@ function postComment(req, res, next) {
   const newComment = req.body;
   insertComment(newComment)
     .then((comment) => {
+
       res.status(201).send(comment.body);
     })
     .catch((err) => {

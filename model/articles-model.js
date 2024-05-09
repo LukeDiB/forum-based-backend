@@ -1,6 +1,6 @@
 const db = require("../db/connection");
-const articles = require("../db/data/test-data/articles");
-const topics = require("../db/data/test-data/topics");
+const articles = require("../db/data/development-data/articles");
+const topics = require("../db/data/development-data/topics");
 
 function selectArticleById(id) {
   let sqlString = `SELECT articles.article_id, articles.title, articles.body, articles.author, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.article_id=$1 GROUP BY articles.article_id;`;
