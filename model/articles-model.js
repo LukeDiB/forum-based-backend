@@ -77,9 +77,6 @@ function updateArticleById(id, inc_votes) {
 }
 
 function removeComment(comment_id) {
-  if (comment_id > commentsData.length) {
-    return Promise.reject({ status: 404, message: "id not found!" });
-  }
 
   const sqlString = `DELETE FROM comments WHERE comment_id=$1`;
   return db.query(sqlString, [comment_id]);
