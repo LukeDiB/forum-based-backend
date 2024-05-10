@@ -1,6 +1,7 @@
 const db = require("../db/connection");
 const articles = require("../db/data/development-data/articles");
 const topics = require("../db/data/development-data/topics");
+const commentsData = require("../db/data/development-data/comments");
 
 function selectArticleById(id) {
   let sqlString = `SELECT articles.article_id, articles.title, articles.body, articles.author, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.article_id=$1 GROUP BY articles.article_id;`;
@@ -75,4 +76,13 @@ function updateArticleById(id, inc_votes) {
   });
 }
 
-module.exports = { selectArticleById, selectAllArticles, updateArticleById };
+function removeComment(comment_id) {
+  if (comment_id > commentsData.length) {
+    return Promise.reject({ status: 404, message: "id not found!" });
+  }
+
+  const sqlString = `DELETE FROM comments WHERE comment_id=$1`;
+  return db.query(sqlString, [comment_id]);
+}
+
+module.exports = { selectArticleById, selectAllArticles, updateArticleById, removeComment };

@@ -2,6 +2,7 @@ const {
   selectArticleById,
   selectAllArticles,
   updateArticleById,
+  removeComment,
 } = require("../model/articles-model");
 
 function getArticles(req, res, next) {
@@ -40,4 +41,16 @@ function patchArticle(req, res, next) {
     });
 }
 
-module.exports = { patchArticle, getArticles };
+function deleteCommentFromArticle(req, res, next) {
+  const { comment_id } = req.params;
+  const message = "comment deleted!";
+  removeComment(comment_id)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
+
+module.exports = { patchArticle, getArticles, deleteCommentFromArticle };
